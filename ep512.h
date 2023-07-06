@@ -15,9 +15,13 @@
 extern BYTE videoRAM[(X_SIZE*Y_SIZE*BPP)/8];
 
 
+#define NUM_SAMPLES 128
+
+
 // il Timer0 conta ogni 14nSec*prescaler... (@140MHz CPUCLK => 70MHz) su PIC24EP
 #define TMR2BASE (27355)		//   10Hz per timer
 #define TMR3BASE 170 //((1000000.0/(X_SIZE*Y_SIZE*FPS)) * (2*1000000000.0/GetPeripheralClock()))	//   2.5uS per 25FpS @128x128
+#define TMR3BASE_2 300 // voglio 2KHz/200Hz => 4uS per 128 campioni
 
 
 

@@ -40,8 +40,8 @@
         enough RAM for the worst case scenario, when USB_INTERRUPTS mode
         was used, causing potentially unexpected operation.
 
- GD 2/7/2023
-	Generatore segnali video per oscilloscopio (asse X-Y-Z)
+ GD 6/7/2023
+	Generatore figure di Lissajous per oscilloscopio (asse X-Y)
 			
 ********************************************************************/
 
@@ -121,6 +121,26 @@ static const char CopyrString[]= {'O','s','c','i','l','l','o','s','c','o','p','e
 	'v',VERNUMH+'0','.',VERNUML/10+'0',(VERNUML % 10)+'0', ' ','0','6','/','7','/','2','3', 0 };
 
 
+const WORD SINE_WAVE_TABLE[NUM_SAMPLES]={
+	0x8000,0x8654,0x8ca4,0x92ed,0x992a,0x9f57,0xa570,0xab72,
+	0xb159,0xb720,0xbcc6,0xc245,0xc79a,0xccc3,0xd1bc,0xd681,
+	0xdb10,0xdf67,0xe381,0xe75d,0xeaf9,0xee51,0xf164,0xf430,
+	0xf6b4,0xf8ed,0xfada,0xfc7a,0xfdcd,0xfed0,0xff84,0xffe8,
+	0xfffc,0xffc0,0xff34,0xfe58,0xfd2d,0xfbb4,0xf9ed,0xf7da,
+	0xf57b,0xf2d3,0xefe3,0xecad,0xe933,0xe577,0xe17c,0xdd43,
+	0xd8d0,0xd425,0xcf46,0xca35,0xc4f5,0xbf8a,0xb9f8,0xb441,
+	0xae69,0xa874,0xa266,0x9c42,0x960d,0x8fca,0x897d,0x832a,
+	0x7cd5,0x7682,0x7035,0x69f2,0x63bd,0x5d99,0x578b,0x5196,
+	0x4bbe,0x4607,0x4075,0x3b0a,0x35ca,0x30b9,0x2bda,0x272f,
+	0x22bc,0x1e83,0x1a88,0x16cc,0x1352,0x101c,0xd2c,0xa84,
+	0x825,0x612,0x44b,0x2d2,0x1a7,0xcb,0x3f,0x3,
+	0x17,0x7b,0x12f,0x232,0x385,0x525,0x712,0x94b,
+	0xbcf,0xe9b,0x11ae,0x1506,0x18a2,0x1c7e,0x2098,0x24ef,
+	0x297e,0x2e43,0x333c,0x3865,0x3dba,0x4339,0x48df,0x4ea6,
+	0x548d,0x5a8f,0x60a8,0x66d5,0x6d12,0x735b,0x79ab,0x8000};
+//https://daycounter.com/Calculators/Sine-Generator-Calculator.phtml
+WORD samplesTable[NUM_SAMPLES],samplesTable2[NUM_SAMPLES];
+
 
 
 
@@ -129,8 +149,6 @@ volatile BYTE second_10=0;
 volatile DWORD milliseconds;
 
 WORD LastAD;
-
-BYTE videoRAM[(X_SIZE*Y_SIZE*BPP)/8];
 
 
 #define TickGet() (tick10)
@@ -199,6 +217,12 @@ mLED_2=1;
 
 
 
+	for(i=0; i<NUM_SAMPLES; i++)
+		samplesTable[i]=SINE_WAVE_TABLE[i] >> 6;
+	for(i=0; i<NUM_SAMPLES; i++)
+		samplesTable2[i]=SINE_WAVE_TABLE[i] >> 6;
+
+
 	UserInit();
 
 
@@ -209,10 +233,6 @@ Beep();
 
 	initADC();
 	initGen();
-
-
-	screenCLS(0);
-	drawLine(10, 60, 90, 60, 1);
 
 
   while(1) {
@@ -396,19 +416,6 @@ int UserInit(void) {
   
   OC2CON1 |= 0x0006;   /* Mode 6, Edge-aligned PWM Mode */ //  
 
-  OC3CON1 = 0x0000;
-  OC3CON2 = 0x0000;
-  
-  OC3RS  = 32768;
-  OC3R   = 16384;
-  
-  OC3CON2 = 0x001f;
-  OC3CON1 = 0x1c00;
-  
-  OC3CON1 |= 0x0006;   /* Mode 6, Edge-aligned PWM Mode */ //  v. beep
-
-
-
 	initADC();
 
 	return 1;
@@ -464,23 +471,19 @@ BYTE initGen(void) {
 	BYTE retVal=1;
 
 			OpenTimer3(T3_ON & T3_IDLE_CON & T3_GATE_OFF & T3_PS_1_1 & T3_SOURCE_INT, 
-				TMR3BASE);
+				TMR3BASE_2);
 			EnableIntT3;
 
-		  OC1RS    = 128;		//550KHz
-		  OC2RS    = 128;
-		  OC3RS    = 16;		//4MHz
+		  OC1RS    = 0x3ff;		//70KHz
+		  OC2RS    = 0x3ff;
   
 		  OC1CON1 = 0x1c00;
   		OC1CON1 |= 0x0006;
 		  OC2CON1 = 0x1c00;
   		OC2CON1 |= 0x0006;
-		  OC3CON1 = 0x1c00;
-  		OC3CON1 |= 0x0006;
 /*			PPSUnLock;
 			PPSOut(_OC1, _RP37);      // output (pwm cmq)
 			PPSOut(_OC2, _RP38);      //
-			PPSOut(_OC3, _RP39);      //
 			PPSLock;*/
 
 	return retVal;

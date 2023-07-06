@@ -6,7 +6,11 @@
 #define isVBlank() 1		// :) v. PC_PIC
 void _swap(WORD *, WORD *);
 
+extern const char font4x6_basic[256][6];
+
 BYTE textsize=1;
+BYTE cursor_x,cursor_y;
+BYTE textcolor=1,textbgcolor=0;
 	
 unsigned char drawPixel(WORD x, WORD y, BYTE c) {
 	DWORD i;
@@ -225,6 +229,8 @@ unsigned char screenCLS(BYTE c) {
     ClrWdt();
     }
     
+	cursor_x=cursor_y=0;
+
   return 1;
 	}
 
@@ -647,4 +653,60 @@ void _swap(WORD *a, WORD *b) {
 	*b = t; 
 	}
 
+
+// Draw a character
+void drawChar(WORD x, WORD y, unsigned char c, BYTE color, BYTE bg, BYTE size) {
+	INT8 i,j;
+	BYTE *fontPtr;
+
+    if((x >= X_SIZE)            || // Clip right
+       (y >= Y_SIZE)           || // Clip bottom
+       ((x + 4 * size - 1) < 0) || // Clip left
+       ((y + 6 * size - 1) < 0))   // Clip top
+      return;
+
+    fontPtr=(BYTE *)font4x6_basic+((UINT16)c)*6;
+    for(i=0; i<6; i++) {
+      BYTE line;
+			line = *(fontPtr+i);
+      for(j=0; j<8; j++, line <<= 1) {
+        if(line & 0x80) {
+          if(size == 1) 
+						drawPixel(x+j, y+i, color);
+          else
+		        drawRectangleFilled(x+(j*size), y+(i*size), size, size, color);
+        	} 
+				else if(bg != color) {
+          if(size == 1) 
+						drawPixel(x+j, y+i, bg);
+          else          
+						drawRectangleFilled(x+(j*size), y+(i*size), size, size, bg);
+      	  }
+    	  }
+  	  }
+
+	}
+
+size_t cwrite(BYTE c) {
+
+    switch(c) {
+      case '\n':
+        cursor_y += 6;
+        cursor_x  = 0;
+        break;
+      case '\r':
+        break;
+      // skip em
+      default:
+        if(((cursor_x + 4) >= X_SIZE)) { 	// Heading off edge?
+          cursor_x  = 0;            // Reset x to zero
+          cursor_y += 6; // Advance y one line
+          }
+        drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+        cursor_x += 4;
+        break;
+    	}
+
+  return 1;
+	}
 
