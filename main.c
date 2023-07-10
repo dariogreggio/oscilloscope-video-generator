@@ -6,7 +6,7 @@
  				boards supported by the MCHPFSUSB stack.  See release notes for
  				support matrix.  This demo can be modified for use on other hardware
  				platforms.
- Complier:  	Microchip C18 (for PIC18), C30 (for PIC24), C32 (for PIC32)
+ Compiler:  	Microchip C18 (for PIC18), C30 (for PIC24), C32 (for PIC32)
  Company:		Microchip Technology, Inc.
 
  Software License Agreement:
@@ -558,7 +558,7 @@ configscan_high  This contains the scan select parameter to be configured into t
 //		EnableADC1;
 	}
 
-	ANSELA= 0b0000000000000001;			// in caso mettere 1; v. sotto cmd 105 che legge e imposta!
+	ANSELA= 0b0000000000000001;			// in caso mettere 1; 
 	ANSELB= 0b0000000000000000;			// idem
 	return 1;
 

@@ -98,11 +98,15 @@ void __attribute__ (( interrupt, shadow,  no_auto_psv )) _T3Interrupt(void) {
 
 	if(ptr1 >= (samplesTable+(NUM_SAMPLES))) {
 		ptr1=samplesTable;
+
+#warning AGGANCIARE a LastAD per spostare fase!
+		tipo ptr2=samplesTable+(LastAD/8);		// 0..128
+
 		}	
 	if(ptr2 >= (samplesTable+(NUM_SAMPLES))) {
 		ptr2=samplesTable;
+togliere
 
-#warning AGGANCIARE a LastAD per spostare fase!
 
 		}	
 	if(ptr3 >= (samplesTable2+(NUM_SAMPLES))) {

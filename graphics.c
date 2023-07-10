@@ -529,7 +529,11 @@ unsigned char drawCircleFilled(WORD x0, WORD y0, WORD r, BYTE color) {
   return 1;
 	}
 
+#if defined (__PIC24)
 #define MAX_FILL_STACK 500  //1000 con 1000 si schianta ancora... ah ovvio, per ogni chiamata sono 64 byte (v.disassembly..)
+#else
+#define MAX_FILL_STACK 20  //
+#endif
 struct POINTS {
 	WORD x,y;
 	};

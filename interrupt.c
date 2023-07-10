@@ -90,9 +90,9 @@ void __attribute__ (( interrupt, shadow,  no_auto_psv )) _T3Interrupt(void) {
 			ycnt=0;
 		  pixelPos=&videoRAM;
 			}
-  	OC1R   = ycnt;
+  	OC2R   = ycnt;
 		}
-	OC2R   = xcnt;
+	OC1R   = xcnt;
 
 #if BPP==2
 	switch(xcnt & 3) {			// 2bpp
