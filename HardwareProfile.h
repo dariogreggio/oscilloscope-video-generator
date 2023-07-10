@@ -48,7 +48,10 @@
 
 
 
-
+#if defined (__PIC24)
             #include "HardwareProfile - PIC24EP512GU810.h"
+#else
+            #include "HardwareProfile - PIC16F1773.h"
+#endif
 
 #endif  //HARDWARE_PROFILE_H
