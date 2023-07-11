@@ -7,3 +7,5 @@ Using a PIC24 @140MHz and its PWM channels for simple DACs
 
 
 Now added another version that can create Lissajous curves!
+
+Further extension: PIC16 with real DACs added (though RAM is way too little to have "patterns" :) )
